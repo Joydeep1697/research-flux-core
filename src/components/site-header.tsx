@@ -42,6 +42,11 @@ export function SiteHeader() {
               <Link to="/settings" className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground">
                 Settings
               </Link>
+              {isAdmin && (
+                <Link to="/admin" className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground">
+                  Admin
+                </Link>
+              )}
               <ThemeToggle />
               <Button
                 size="sm"
