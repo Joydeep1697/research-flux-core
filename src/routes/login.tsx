@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { logClientAuditEvent } from "@/lib/audit.functions";
 import { lovable } from "@/integrations/lovable";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,6 +32,15 @@ function LoginPage() {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
     if (error) {
+      void logClientAuditEvent({
+        data: {
+          category: "auth",
+          event: "auth.sign_in_failed",
+          status: "failure",
+          actor_email: email,
+          metadata: { reason: error.message },
+        },
+      }).catch(() => {});
       toast.error(error.message);
       return;
     }
