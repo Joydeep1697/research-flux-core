@@ -9,8 +9,16 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Loader2, Search, Trash2, FileText, Sparkles } from "lucide-react";
+import { Loader2, Search, Trash2, FileText, Sparkles, Zap, Layers, Telescope } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+
+type Depth = "quick" | "standard" | "deep";
+
+const DEPTH_OPTIONS: Array<{ value: Depth; label: string; desc: string; icon: typeof Zap }> = [
+  { value: "quick", label: "Quick", desc: "~30s · 3 queries · ~12 sources", icon: Zap },
+  { value: "standard", label: "Standard", desc: "~2 min · 5+3 queries · ~22 sources", icon: Layers },
+  { value: "deep", label: "Deep", desc: "~4 min · 7+8 queries · ~35 sources · Pro", icon: Telescope },
+];
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — Lumen Research" }] }),
@@ -24,6 +32,7 @@ function DashboardPage() {
   const runResearch = useServerFn(startResearch);
   const removeReport = useServerFn(deleteReport);
   const [query, setQuery] = useState("");
+  const [depth, setDepth] = useState<Depth>("standard");
   const [submitting, setSubmitting] = useState(false);
 
   const { data: reports = [], isLoading } = useQuery({
@@ -65,7 +74,7 @@ function DashboardPage() {
     }
     setSubmitting(true);
     try {
-      const result = await runResearch({ data: { query: query.trim() } });
+      const result = await runResearch({ data: { query: query.trim(), depth } });
       setQuery("");
       queryClient.invalidateQueries({ queryKey: ["reports"] });
       navigate({ to: "/research/$id", params: { id: result.id } });
