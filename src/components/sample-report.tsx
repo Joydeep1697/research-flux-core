@@ -182,7 +182,7 @@ export function SampleReportView({
             <li
               key={s.index}
               id={`source-${s.index}`}
-              className="flex gap-2 rounded-md border border-transparent px-2 py-1 target:border-primary target:bg-primary/5"
+              className="flex gap-2 scroll-mt-20 rounded-md border border-transparent px-2 py-1"
             >
               <span className="shrink-0 text-muted-foreground">[{s.index}]</span>
               <div className="min-w-0 flex-1">
