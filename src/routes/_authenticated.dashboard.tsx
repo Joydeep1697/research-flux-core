@@ -9,8 +9,16 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Loader2, Search, Trash2, FileText, Sparkles } from "lucide-react";
+import { Loader2, Search, Trash2, FileText, Sparkles, Zap, Layers, Telescope } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+
+type Depth = "quick" | "standard" | "deep";
+
+const DEPTH_OPTIONS: Array<{ value: Depth; label: string; desc: string; icon: typeof Zap }> = [
+  { value: "quick", label: "Quick", desc: "~30s · 3 queries · ~12 sources", icon: Zap },
+  { value: "standard", label: "Standard", desc: "~2 min · 5+3 queries · ~22 sources", icon: Layers },
+  { value: "deep", label: "Deep", desc: "~4 min · 7+8 queries · ~35 sources · Pro", icon: Telescope },
+];
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — Lumen Research" }] }),
@@ -24,6 +32,7 @@ function DashboardPage() {
   const runResearch = useServerFn(startResearch);
   const removeReport = useServerFn(deleteReport);
   const [query, setQuery] = useState("");
+  const [depth, setDepth] = useState<Depth>("standard");
   const [submitting, setSubmitting] = useState(false);
 
   const { data: reports = [], isLoading } = useQuery({
@@ -65,7 +74,7 @@ function DashboardPage() {
     }
     setSubmitting(true);
     try {
-      const result = await runResearch({ data: { query: query.trim() } });
+      const result = await runResearch({ data: { query: query.trim(), depth } });
       setQuery("");
       queryClient.invalidateQueries({ queryKey: ["reports"] });
       navigate({ to: "/research/$id", params: { id: result.id } });
@@ -112,8 +121,38 @@ function DashboardPage() {
           className="mt-3 resize-none"
           disabled={submitting}
         />
-        <div className="mt-4 flex items-center justify-between">
-          <p className="text-xs text-muted-foreground">Lumen will run multiple web searches and synthesize a structured report. Takes ~1-2 minutes.</p>
+        <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
+          {DEPTH_OPTIONS.map((opt) => {
+            const Icon = opt.icon;
+            const selected = depth === opt.value;
+            const locked = opt.value === "deep" && plan === "free";
+            return (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => !locked && setDepth(opt.value)}
+                disabled={submitting || locked}
+                className={`flex flex-col items-start gap-1 rounded-lg border p-3 text-left transition-colors ${
+                  selected
+                    ? "border-primary bg-primary/5"
+                    : "border-border bg-background hover:border-primary/40"
+                } ${locked ? "cursor-not-allowed opacity-60" : ""}`}
+                aria-pressed={selected}
+              >
+                <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                  <Icon className={`h-4 w-4 ${selected ? "text-primary" : "text-muted-foreground"}`} />
+                  {opt.label}
+                  {locked && <span className="ml-auto text-[10px] font-normal text-muted-foreground">Pro</span>}
+                </div>
+                <p className="text-xs text-muted-foreground">{opt.desc}</p>
+              </button>
+            );
+          })}
+        </div>
+        <div className="mt-4 flex items-center justify-between gap-3">
+          <p className="text-xs text-muted-foreground">
+            Lumen plans queries, fans out web searches, audits gaps, and writes a cited Markdown report.
+          </p>
           <Button type="submit" disabled={submitting || !query.trim()}>
             {submitting ? (
               <>
