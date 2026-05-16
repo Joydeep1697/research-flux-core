@@ -35,14 +35,17 @@ function DashboardPage() {
   const [depth, setDepth] = useState<Depth>("standard");
   const [submitting, setSubmitting] = useState(false);
 
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"all" | "completed" | "running" | "failed">("all");
+
   const { data: reports = [], isLoading } = useQuery({
     queryKey: ["reports", user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("research_reports")
-        .select("id, query, status, created_at, completed_at, error")
+        .select("id, query, status, created_at, completed_at, error, is_public")
         .order("created_at", { ascending: false })
-        .limit(50);
+        .limit(100);
       if (error) throw new Error(error.message);
       return data;
     },
@@ -51,6 +54,22 @@ function DashboardPage() {
       const rows = q.state.data as Array<{ status: string }> | undefined;
       return rows?.some((r) => r.status === "researching" || r.status === "pending" || r.status === "synthesizing") ? 3000 : false;
     },
+  });
+
+  const { data: monthlyCount = 0 } = useQuery({
+    queryKey: ["reports-month", user?.id],
+    queryFn: async () => {
+      const monthStart = new Date();
+      monthStart.setUTCDate(1);
+      monthStart.setUTCHours(0, 0, 0, 0);
+      const { count, error } = await supabase
+        .from("research_reports")
+        .select("id", { count: "exact", head: true })
+        .gte("created_at", monthStart.toISOString());
+      if (error) throw new Error(error.message);
+      return count ?? 0;
+    },
+    enabled: !!user,
   });
 
   const { data: subscription } = useQuery({
