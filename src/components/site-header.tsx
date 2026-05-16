@@ -1,5 +1,7 @@
 import { Link, useNavigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Telescope } from "lucide-react";
@@ -7,6 +9,19 @@ import { Telescope } from "lucide-react";
 export function SiteHeader() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+
+  const { data: isAdmin } = useQuery({
+    queryKey: ["is-admin", user?.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("role", "admin")
+        .maybeSingle();
+      return !!data;
+    },
+    enabled: !!user,
+  });
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur">
@@ -27,6 +42,11 @@ export function SiteHeader() {
               <Link to="/settings" className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground">
                 Settings
               </Link>
+              {isAdmin && (
+                <Link to="/admin" className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground">
+                  Admin
+                </Link>
+              )}
               <ThemeToggle />
               <Button
                 size="sm"

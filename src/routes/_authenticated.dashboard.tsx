@@ -35,14 +35,17 @@ function DashboardPage() {
   const [depth, setDepth] = useState<Depth>("standard");
   const [submitting, setSubmitting] = useState(false);
 
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"all" | "completed" | "running" | "failed">("all");
+
   const { data: reports = [], isLoading } = useQuery({
     queryKey: ["reports", user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("research_reports")
-        .select("id, query, status, created_at, completed_at, error")
+        .select("id, query, status, created_at, completed_at, error, is_public")
         .order("created_at", { ascending: false })
-        .limit(50);
+        .limit(100);
       if (error) throw new Error(error.message);
       return data;
     },
@@ -51,6 +54,22 @@ function DashboardPage() {
       const rows = q.state.data as Array<{ status: string }> | undefined;
       return rows?.some((r) => r.status === "researching" || r.status === "pending" || r.status === "synthesizing") ? 3000 : false;
     },
+  });
+
+  const { data: monthlyCount = 0 } = useQuery({
+    queryKey: ["reports-month", user?.id],
+    queryFn: async () => {
+      const monthStart = new Date();
+      monthStart.setUTCDate(1);
+      monthStart.setUTCHours(0, 0, 0, 0);
+      const { count, error } = await supabase
+        .from("research_reports")
+        .select("id", { count: "exact", head: true })
+        .gte("created_at", monthStart.toISOString());
+      if (error) throw new Error(error.message);
+      return count ?? 0;
+    },
+    enabled: !!user,
   });
 
   const { data: subscription } = useQuery({
@@ -97,6 +116,20 @@ function DashboardPage() {
   };
 
   const plan = subscription?.plan ?? "free";
+  const quota = plan === "enterprise" ? 10000 : plan === "pro" ? 100 : 5;
+  const usagePct = Math.min(100, Math.round((monthlyCount / quota) * 100));
+
+  const filteredReports = reports.filter((r) => {
+    if (statusFilter === "completed" && r.status !== "completed") return false;
+    if (statusFilter === "failed" && r.status !== "failed") return false;
+    if (
+      statusFilter === "running" &&
+      !["pending", "researching", "synthesizing"].includes(r.status)
+    )
+      return false;
+    if (searchTerm && !r.query.toLowerCase().includes(searchTerm.toLowerCase())) return false;
+    return true;
+  });
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-10">
@@ -105,7 +138,21 @@ function DashboardPage() {
           <h1 className="text-3xl font-bold tracking-tight text-foreground">Your research</h1>
           <p className="mt-1 text-sm text-muted-foreground">Ask a question. Get a cited report.</p>
         </div>
-        <Badge variant="secondary" className="capitalize">{plan} plan</Badge>
+        <div className="flex flex-col items-end gap-2">
+          <Badge variant="secondary" className="capitalize">{plan} plan</Badge>
+          <div className="w-48">
+            <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+              <span>This month</span>
+              <span>{monthlyCount} / {quota === 10000 ? "∞" : quota}</span>
+            </div>
+            <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+              <div
+                className={`h-full transition-all ${usagePct >= 90 ? "bg-destructive" : "bg-primary"}`}
+                style={{ width: `${usagePct}%` }}
+              />
+            </div>
+          </div>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="mt-8 rounded-xl border border-border bg-card p-6 shadow-sm">
@@ -168,17 +215,47 @@ function DashboardPage() {
       </form>
 
       <div className="mt-10">
-        <h2 className="text-lg font-semibold text-foreground">History</h2>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-lg font-semibold text-foreground">History</h2>
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+              <input
+                type="search"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search reports…"
+                className="h-8 w-56 rounded-md border border-input bg-background pl-8 pr-3 text-sm outline-none focus:ring-1 focus:ring-ring"
+              />
+            </div>
+            {(["all", "completed", "running", "failed"] as const).map((s) => (
+              <button
+                key={s}
+                type="button"
+                onClick={() => setStatusFilter(s)}
+                className={`h-8 rounded-md border px-3 text-xs capitalize transition-colors ${
+                  statusFilter === s
+                    ? "border-primary bg-primary/10 text-foreground"
+                    : "border-border bg-background text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+        </div>
         {isLoading ? (
           <p className="mt-4 text-sm text-muted-foreground">Loading…</p>
-        ) : reports.length === 0 ? (
+        ) : filteredReports.length === 0 ? (
           <div className="mt-6 rounded-lg border border-dashed border-border p-12 text-center">
             <FileText className="mx-auto h-10 w-10 text-muted-foreground" />
-            <p className="mt-4 text-sm text-muted-foreground">No reports yet. Run your first research above.</p>
+            <p className="mt-4 text-sm text-muted-foreground">
+              {reports.length === 0 ? "No reports yet. Run your first research above." : "No reports match your filters."}
+            </p>
           </div>
         ) : (
           <ul className="mt-4 space-y-2">
-            {reports.map((r) => (
+            {filteredReports.map((r) => (
               <li key={r.id} className="group flex items-center gap-3 rounded-lg border border-border bg-card p-4 transition-colors hover:border-primary/40">
                 <Link to="/research/$id" params={{ id: r.id }} className="min-w-0 flex-1">
                   <p className="truncate font-medium text-card-foreground">{r.query}</p>
@@ -186,6 +263,7 @@ function DashboardPage() {
                     {formatDistanceToNow(new Date(r.created_at), { addSuffix: true })}
                   </p>
                 </Link>
+                {r.is_public && <Badge variant="outline" className="text-[10px]">Public</Badge>}
                 <StatusBadge status={r.status} />
                 <Button
                   variant="ghost"

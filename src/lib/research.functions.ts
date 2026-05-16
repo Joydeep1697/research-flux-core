@@ -384,3 +384,54 @@ export const deleteReport = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+function makeSlug() {
+  // 16 url-safe chars
+  const alphabet = "abcdefghijklmnopqrstuvwxyz0123456789";
+  let s = "";
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  for (const b of bytes) s += alphabet[b % alphabet.length];
+  return s;
+}
+
+export const toggleReportPublic = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({ id: z.string().uuid(), isPublic: z.boolean() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { data: existing, error: readErr } = await supabase
+      .from("research_reports")
+      .select("public_slug")
+      .eq("id", data.id)
+      .single();
+    if (readErr) throw new Error(readErr.message);
+
+    const slug = data.isPublic ? existing?.public_slug ?? makeSlug() : existing?.public_slug;
+    const { error } = await supabase
+      .from("research_reports")
+      .update({ is_public: data.isPublic, public_slug: slug })
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { slug: data.isPublic ? slug : null };
+  });
+
+export const getReportBySlug = createServerFn({ method: "GET" })
+  .inputValidator((input) => z.object({ slug: z.string().min(8).max(64) }).parse(input))
+  .handler(async ({ data }) => {
+    // Uses the public RLS policy (is_public = true) via the anon-key client.
+    const { createClient } = await import("@supabase/supabase-js");
+    const url = process.env.SUPABASE_URL!;
+    const key = process.env.SUPABASE_PUBLISHABLE_KEY!;
+    const anon = createClient(url, key);
+    const { data: report, error } = await anon
+      .from("research_reports")
+      .select("id, query, content, sources, created_at, completed_at, is_public")
+      .eq("public_slug", data.slug)
+      .eq("is_public", true)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    return report;
+  });
