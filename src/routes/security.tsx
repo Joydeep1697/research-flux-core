@@ -87,9 +87,9 @@ function SecurityPage() {
         <section className="mt-8 rounded-xl border border-border bg-card p-6">
           <h2 className="text-lg font-semibold text-card-foreground">Reporting a vulnerability</h2>
           <p className="mt-3 text-sm text-muted-foreground">
-            Found a security issue? Please disclose responsibly via our{" "}
-            <Link to="/contact" className="text-primary hover:underline">contact page</Link>{" "}
-            or email security@lumen.research. We acknowledge within 2 business days.
+            Found a security issue? Please disclose responsibly by emailing{" "}
+            <a href="mailto:security@lumen.research" className="text-primary hover:underline">security@lumen.research</a>.
+            We acknowledge within 2 business days.
           </p>
         </section>
       </main>
