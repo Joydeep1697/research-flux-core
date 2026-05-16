@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createHmac, timingSafeEqual } from "crypto";
-import { recordAuditEvent } from "@/lib/audit.functions";
+import { recordAuditEvent } from "@/lib/audit.server";
 
 /**
  * Billing webhook receiver. Verifies HMAC-SHA256 signature against
