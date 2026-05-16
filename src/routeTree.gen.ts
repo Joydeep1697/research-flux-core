@@ -19,6 +19,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as RSlugRouteImport } from './routes/r.$slug'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated.settings'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated.admin'
 import { Route as ApiPublicBillingWebhookRouteImport } from './routes/api/public/billing-webhook'
 import { Route as AuthenticatedResearchIdRouteImport } from './routes/_authenticated.research.$id'
 
@@ -71,6 +72,11 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const ApiPublicBillingWebhookRoute = ApiPublicBillingWebhookRouteImport.update({
   id: '/api/public/billing-webhook',
   path: '/api/public/billing-webhook',
@@ -89,6 +95,7 @@ export interface FileRoutesByFullPath {
   '/pricing': typeof PricingRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/r/$slug': typeof RSlugRoute
@@ -102,6 +109,7 @@ export interface FileRoutesByTo {
   '/pricing': typeof PricingRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/r/$slug': typeof RSlugRoute
@@ -117,6 +125,7 @@ export interface FileRoutesById {
   '/pricing': typeof PricingRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/r/$slug': typeof RSlugRoute
@@ -132,6 +141,7 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/reset-password'
     | '/signup'
+    | '/admin'
     | '/dashboard'
     | '/settings'
     | '/r/$slug'
@@ -145,6 +155,7 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/reset-password'
     | '/signup'
+    | '/admin'
     | '/dashboard'
     | '/settings'
     | '/r/$slug'
@@ -159,6 +170,7 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/reset-password'
     | '/signup'
+    | '/_authenticated/admin'
     | '/_authenticated/dashboard'
     | '/_authenticated/settings'
     | '/r/$slug'
@@ -250,6 +262,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/api/public/billing-webhook': {
       id: '/api/public/billing-webhook'
       path: '/api/public/billing-webhook'
@@ -268,12 +287,14 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedResearchIdRoute: typeof AuthenticatedResearchIdRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedResearchIdRoute: AuthenticatedResearchIdRoute,
