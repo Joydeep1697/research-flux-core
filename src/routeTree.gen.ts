@@ -18,6 +18,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated.settings'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
+import { Route as ApiPublicBillingWebhookRouteImport } from './routes/api/public/billing-webhook'
 import { Route as AuthenticatedResearchIdRouteImport } from './routes/_authenticated.research.$id'
 
 const SignupRoute = SignupRouteImport.update({
@@ -64,6 +65,11 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const ApiPublicBillingWebhookRoute = ApiPublicBillingWebhookRouteImport.update({
+  id: '/api/public/billing-webhook',
+  path: '/api/public/billing-webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedResearchIdRoute = AuthenticatedResearchIdRouteImport.update({
   id: '/research/$id',
   path: '/research/$id',
@@ -80,6 +86,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/research/$id': typeof AuthenticatedResearchIdRoute
+  '/api/public/billing-webhook': typeof ApiPublicBillingWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -91,6 +98,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/research/$id': typeof AuthenticatedResearchIdRoute
+  '/api/public/billing-webhook': typeof ApiPublicBillingWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -104,6 +112,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/research/$id': typeof AuthenticatedResearchIdRoute
+  '/api/public/billing-webhook': typeof ApiPublicBillingWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -117,6 +126,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/settings'
     | '/research/$id'
+    | '/api/public/billing-webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -128,6 +138,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/settings'
     | '/research/$id'
+    | '/api/public/billing-webhook'
   id:
     | '__root__'
     | '/'
@@ -140,6 +151,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/settings'
     | '/_authenticated/research/$id'
+    | '/api/public/billing-webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -150,6 +162,7 @@ export interface RootRouteChildren {
   PricingRoute: typeof PricingRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SignupRoute: typeof SignupRoute
+  ApiPublicBillingWebhookRoute: typeof ApiPublicBillingWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -217,6 +230,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/api/public/billing-webhook': {
+      id: '/api/public/billing-webhook'
+      path: '/api/public/billing-webhook'
+      fullPath: '/api/public/billing-webhook'
+      preLoaderRoute: typeof ApiPublicBillingWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/research/$id': {
       id: '/_authenticated/research/$id'
       path: '/research/$id'
@@ -251,7 +271,18 @@ const rootRouteChildren: RootRouteChildren = {
   PricingRoute: PricingRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SignupRoute: SignupRoute,
+  ApiPublicBillingWebhookRoute: ApiPublicBillingWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
