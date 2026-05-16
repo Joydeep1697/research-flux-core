@@ -90,6 +90,8 @@ export type Database = {
           created_at: string
           error: string | null
           id: string
+          is_public: boolean
+          public_slug: string | null
           query: string
           sources: Json
           status: Database["public"]["Enums"]["report_status"]
@@ -102,6 +104,8 @@ export type Database = {
           created_at?: string
           error?: string | null
           id?: string
+          is_public?: boolean
+          public_slug?: string | null
           query: string
           sources?: Json
           status?: Database["public"]["Enums"]["report_status"]
@@ -114,6 +118,8 @@ export type Database = {
           created_at?: string
           error?: string | null
           id?: string
+          is_public?: boolean
+          public_slug?: string | null
           query?: string
           sources?: Json
           status?: Database["public"]["Enums"]["report_status"]
