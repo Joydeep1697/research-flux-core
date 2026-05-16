@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      audit_logs: {
+        Row: {
+          actor_email: string | null
+          actor_user_id: string | null
+          category: Database["public"]["Enums"]["audit_event_category"]
+          created_at: string
+          event: string
+          id: string
+          ip_address: string | null
+          metadata: Json
+          resource: string | null
+          status: Database["public"]["Enums"]["audit_event_status"]
+          user_agent: string | null
+        }
+        Insert: {
+          actor_email?: string | null
+          actor_user_id?: string | null
+          category: Database["public"]["Enums"]["audit_event_category"]
+          created_at?: string
+          event: string
+          id?: string
+          ip_address?: string | null
+          metadata?: Json
+          resource?: string | null
+          status?: Database["public"]["Enums"]["audit_event_status"]
+          user_agent?: string | null
+        }
+        Update: {
+          actor_email?: string | null
+          actor_user_id?: string | null
+          category?: Database["public"]["Enums"]["audit_event_category"]
+          created_at?: string
+          event?: string
+          id?: string
+          ip_address?: string | null
+          metadata?: Json
+          resource?: string | null
+          status?: Database["public"]["Enums"]["audit_event_status"]
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -152,6 +194,13 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
+      audit_event_category:
+        | "auth"
+        | "billing"
+        | "access_denied"
+        | "admin"
+        | "data"
+      audit_event_status: "success" | "failure" | "denied"
       report_status:
         | "pending"
         | "researching"
@@ -293,6 +342,14 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
+      audit_event_category: [
+        "auth",
+        "billing",
+        "access_denied",
+        "admin",
+        "data",
+      ],
+      audit_event_status: ["success", "failure", "denied"],
       report_status: [
         "pending",
         "researching",
