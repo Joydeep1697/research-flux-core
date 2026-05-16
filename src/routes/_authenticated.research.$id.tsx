@@ -21,6 +21,9 @@ type Source = { index: number; title: string; url: string };
 
 function ReportPage() {
   const { id } = Route.useParams();
+  const queryClient = useQueryClient();
+  const togglePublic = useServerFn(toggleReportPublic);
+  const [sharing, setSharing] = useState(false);
 
   const { data: report, isLoading } = useQuery({
     queryKey: ["report", id],
@@ -67,7 +70,44 @@ function ReportPage() {
     toast.success("Markdown copied");
   };
 
+  const handleDownload = () => {
+    if (!report.content) return;
+    const blob = new Blob([report.content], { type: "text/markdown;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${report.query.slice(0, 60).replace(/[^a-z0-9]+/gi, "-").toLowerCase()}.md`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const handlePrint = () => window.print();
+
+  const handleToggleShare = async () => {
+    setSharing(true);
+    try {
+      const res = await togglePublic({ data: { id: report.id, isPublic: !report.is_public } });
+      await queryClient.invalidateQueries({ queryKey: ["report", id] });
+      if (res.slug) {
+        const link = `${window.location.origin}/r/${res.slug}`;
+        await navigator.clipboard.writeText(link).catch(() => {});
+        toast.success("Public link copied to clipboard");
+      } else {
+        toast.success("Report is now private");
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Share toggle failed");
+    } finally {
+      setSharing(false);
+    }
+  };
+
+  const handleCopyShareLink = async () => {
+    if (!report.public_slug) return;
+    const link = `${window.location.origin}/r/${report.public_slug}`;
+    await navigator.clipboard.writeText(link);
+    toast.success("Link copied");
+  };
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
@@ -84,16 +124,34 @@ function ReportPage() {
           <h1 className="text-2xl font-bold tracking-tight text-foreground">{report.query}</h1>
           <p className="mt-2 text-xs text-muted-foreground">
             {formatDistanceToNow(new Date(report.created_at), { addSuffix: true })}
+            {report.is_public && <span className="ml-2 text-primary">· Public</span>}
           </p>
         </div>
-        <div className="flex items-center gap-2 print:hidden">
+        <div className="flex flex-wrap items-center gap-2 print:hidden">
           {report.status === "completed" && (
             <>
               <Button variant="outline" size="sm" onClick={handleCopy}>
-                <Copy className="mr-2 h-4 w-4" /> Copy Markdown
+                <Copy className="mr-2 h-4 w-4" /> Copy
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleDownload}>
+                <Download className="mr-2 h-4 w-4" /> .md
               </Button>
               <Button variant="outline" size="sm" onClick={handlePrint}>
-                <Printer className="mr-2 h-4 w-4" /> Export PDF
+                <Printer className="mr-2 h-4 w-4" /> PDF
+              </Button>
+              {report.is_public && report.public_slug && (
+                <Button variant="outline" size="sm" onClick={handleCopyShareLink}>
+                  <LinkIcon className="mr-2 h-4 w-4" /> Copy link
+                </Button>
+              )}
+              <Button
+                variant={report.is_public ? "secondary" : "default"}
+                size="sm"
+                onClick={handleToggleShare}
+                disabled={sharing}
+              >
+                <Share2 className="mr-2 h-4 w-4" />
+                {sharing ? "…" : report.is_public ? "Make private" : "Share"}
               </Button>
             </>
           )}
