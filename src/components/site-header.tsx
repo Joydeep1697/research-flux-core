@@ -30,7 +30,13 @@ export function SiteHeader() {
           <Telescope className="h-5 w-5 text-primary" />
           <span>Lumen Research</span>
         </Link>
-        <nav className="flex items-center gap-2">
+        <nav className="flex items-center gap-1 sm:gap-2">
+          <Link to="/examples" className="hidden px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground sm:inline">
+            Examples
+          </Link>
+          <Link to="/how-it-works" className="hidden px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground md:inline">
+            How it works
+          </Link>
           <Link to="/pricing" className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground">
             Pricing
           </Link>
