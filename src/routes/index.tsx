@@ -1,7 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { SiteHeader } from "@/components/site-header";
-import { ArrowRight, Globe, FileText, Zap, Shield, Search, Sparkles } from "lucide-react";
+import { SampleReportView } from "@/components/sample-report";
+import { SAMPLE_REPORTS } from "@/lib/sample-reports";
+import { ArrowRight, Globe, FileText, Zap, Shield, Search, Sparkles, ShieldCheck } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -10,12 +13,16 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "Ask any research question. Lumen searches the live web, reads dozens of sources, and writes you a structured, cited report in minutes." },
       { property: "og:title", content: "Lumen Research" },
       { property: "og:description", content: "AI-powered deep research with live web sources and cited reports." },
+      { property: "og:url", content: "https://research-flux-core.lovable.app/" },
     ],
+    links: [{ rel: "canonical", href: "https://research-flux-core.lovable.app/" }],
   }),
   component: LandingPage,
 });
 
 function LandingPage() {
+  const featured = SAMPLE_REPORTS[0];
+
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader />
@@ -24,7 +31,7 @@ function LandingPage() {
         {/* Hero */}
         <section className="relative overflow-hidden border-b border-border">
           <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,_var(--color-primary)/0.08,_transparent_50%)]" />
-          <div className="mx-auto max-w-5xl px-4 py-24 text-center sm:py-32">
+          <div className="mx-auto max-w-5xl px-4 py-20 text-center sm:py-28">
             <div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-1.5 text-xs font-medium text-muted-foreground">
               <Sparkles className="h-3.5 w-3.5 text-primary" />
               Powered by frontier AI and live web search
@@ -45,12 +52,43 @@ function LandingPage() {
                 </Link>
               </Button>
               <Button size="lg" variant="outline" asChild>
-                <Link to="/pricing">View pricing</Link>
+                <Link to="/examples">See example reports</Link>
               </Button>
             </div>
             <p className="mt-4 text-xs text-muted-foreground">
               No credit card required · 5 reports/month on Free
             </p>
+          </div>
+        </section>
+
+        {/* Live sample report preview */}
+        <section className="border-b border-border bg-muted/20">
+          <div className="mx-auto max-w-4xl px-4 py-20">
+            <div className="text-center">
+              <Badge variant="secondary" className="mb-3">
+                <ShieldCheck className="mr-1 h-3 w-3" /> Real Lumen output · hover any [N] citation
+              </Badge>
+              <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+                See what a Lumen report actually looks like
+              </h2>
+              <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">
+                Below is a real report Lumen produced. Every claim links back to its source —
+                hover any bracketed number to preview where it came from.
+              </p>
+            </div>
+
+            <div className="mt-10">
+              <SampleReportView report={featured} defaultCollapsedAfter={1} />
+            </div>
+
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+              <Button asChild>
+                <Link to="/examples">Browse more examples <ArrowRight className="ml-2 h-4 w-4" /></Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link to="/how-it-works">How the pipeline works</Link>
+              </Button>
+            </div>
           </div>
         </section>
 
@@ -119,12 +157,15 @@ function LandingPage() {
             <p className="mt-4 text-muted-foreground">
               Free to start. Upgrade when you need more.
             </p>
-            <div className="mt-8">
+            <div className="mt-8 flex flex-wrap justify-center gap-3">
               <Button size="lg" asChild>
                 <Link to="/signup">
                   Create your account
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
+              </Button>
+              <Button size="lg" variant="outline" asChild>
+                <Link to="/security">Security & privacy</Link>
               </Button>
             </div>
           </div>
@@ -132,8 +173,16 @@ function LandingPage() {
       </main>
 
       <footer className="border-t border-border py-8">
-        <div className="mx-auto max-w-6xl px-4 text-center text-sm text-muted-foreground">
-          © {new Date().getFullYear()} Lumen Research. All rights reserved.
+        <div className="mx-auto max-w-6xl px-4">
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
+            <Link to="/examples" className="hover:text-foreground">Examples</Link>
+            <Link to="/how-it-works" className="hover:text-foreground">How it works</Link>
+            <Link to="/pricing" className="hover:text-foreground">Pricing</Link>
+            <Link to="/security" className="hover:text-foreground">Security</Link>
+          </div>
+          <div className="mt-4 text-center text-sm text-muted-foreground">
+            © {new Date().getFullYear()} Lumen Research. All rights reserved.
+          </div>
         </div>
       </footer>
     </div>
