@@ -42,7 +42,7 @@ export async function recordAuditEvent(input: z.infer<typeof LogSchema>) {
     actor_user_id: parsed.actor_user_id ?? null,
     actor_email: parsed.actor_email ?? null,
     resource: parsed.resource ?? null,
-    metadata: parsed.metadata ?? {},
+    metadata: (parsed.metadata ?? {}) as never,
     ip_address,
     user_agent,
   });
