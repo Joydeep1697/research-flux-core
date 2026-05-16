@@ -121,8 +121,38 @@ function DashboardPage() {
           className="mt-3 resize-none"
           disabled={submitting}
         />
-        <div className="mt-4 flex items-center justify-between">
-          <p className="text-xs text-muted-foreground">Lumen will run multiple web searches and synthesize a structured report. Takes ~1-2 minutes.</p>
+        <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
+          {DEPTH_OPTIONS.map((opt) => {
+            const Icon = opt.icon;
+            const selected = depth === opt.value;
+            const locked = opt.value === "deep" && plan === "free";
+            return (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => !locked && setDepth(opt.value)}
+                disabled={submitting || locked}
+                className={`flex flex-col items-start gap-1 rounded-lg border p-3 text-left transition-colors ${
+                  selected
+                    ? "border-primary bg-primary/5"
+                    : "border-border bg-background hover:border-primary/40"
+                } ${locked ? "cursor-not-allowed opacity-60" : ""}`}
+                aria-pressed={selected}
+              >
+                <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                  <Icon className={`h-4 w-4 ${selected ? "text-primary" : "text-muted-foreground"}`} />
+                  {opt.label}
+                  {locked && <span className="ml-auto text-[10px] font-normal text-muted-foreground">Pro</span>}
+                </div>
+                <p className="text-xs text-muted-foreground">{opt.desc}</p>
+              </button>
+            );
+          })}
+        </div>
+        <div className="mt-4 flex items-center justify-between gap-3">
+          <p className="text-xs text-muted-foreground">
+            Lumen plans queries, fans out web searches, audits gaps, and writes a cited Markdown report.
+          </p>
           <Button type="submit" disabled={submitting || !query.trim()}>
             {submitting ? (
               <>
