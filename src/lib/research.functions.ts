@@ -2,10 +2,10 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-const PLAN_QUOTAS: Record<string, number> = {
-  free: 5,
-  pro: 100,
-  enterprise: 10000,
+const PLAN_QUOTAS: Record<string, { limit: number; window: "day" | "month" }> = {
+  free: { limit: 5, window: "day" },
+  pro: { limit: 100, window: "month" },
+  enterprise: { limit: 10000, window: "month" },
 };
 
 type Depth = "quick" | "standard" | "deep";
