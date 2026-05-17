@@ -4,11 +4,43 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const PLAN_QUOTAS: Record<string, { limit: number; window: "day" | "month" }> = {
   free: { limit: 5, window: "day" },
-  pro: { limit: 100, window: "month" },
+  pro: { limit: 75, window: "day" },
   enterprise: { limit: 10000, window: "month" },
 };
 
 type Depth = "quick" | "standard" | "deep";
+type Length = "brief" | "short" | "medium" | "long";
+type Level = "school" | "undergrad" | "postgrad" | "phd";
+
+const LENGTH_CONFIG: Record<Length, { minWords: number; targetWords: number; label: string }> = {
+  brief: { minWords: 150, targetWords: 220, label: "under 250 words" },
+  short: { minWords: 250, targetWords: 500, label: "between 250 and 750 words" },
+  medium: { minWords: 750, targetWords: 900, label: "between 750 and 1000 words" },
+  long: { minWords: 1000, targetWords: 1600, label: "over 1000 words" },
+};
+
+const LEVEL_CONFIG: Record<Level, { label: string; guidance: string }> = {
+  school: {
+    label: "School",
+    guidance:
+      "Write for a high-school audience: short sentences, plain English, define any technical term in parentheses, avoid jargon, use concrete examples.",
+  },
+  undergrad: {
+    label: "Undergraduate",
+    guidance:
+      "Write at an undergraduate level: clear academic prose, introduce key concepts before using them, balanced explanation and analysis.",
+  },
+  postgrad: {
+    label: "Postgraduate",
+    guidance:
+      "Write at a graduate level: assume domain literacy, use precise terminology, engage critically with methods and trade-offs, compare frameworks.",
+  },
+  phd: {
+    label: "PhD / Expert",
+    guidance:
+      "Write at a doctoral / expert level: rigorous, technical, scrutinise methodology, surface epistemic uncertainty, situate findings in the broader literature, use field-specific terminology without dilution.",
+  },
+};
 
 type DepthConfig = {
   initialSubQueries: number;
