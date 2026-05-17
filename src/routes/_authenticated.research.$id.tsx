@@ -63,6 +63,12 @@ function ReportPage() {
 
   const isRunning = report.status === "researching" || report.status === "synthesizing" || report.status === "pending";
   const sources = (report.sources as Source[] | null) ?? [];
+  // The synthesis prompt asks the model to include a "## Sources" section, but we
+  // render a richer interactive list below. Strip the inline one to avoid duplicates.
+  const displayContent = (report.content ?? "").replace(
+    /\n#{1,6}\s*Sources?\b[\s\S]*$/i,
+    "",
+  ).trimEnd();
 
   const handleCopy = () => {
     if (!report.content) return;
