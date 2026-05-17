@@ -123,7 +123,7 @@ function DashboardPage() {
     }
     setSubmitting(true);
     try {
-      const result = await runResearch({ data: { query: query.trim(), depth } });
+      const result = await runResearch({ data: { query: query.trim(), depth, length, level } });
       setQuery("");
       queryClient.invalidateQueries({ queryKey: ["reports"] });
       navigate({ to: "/research/$id", params: { id: result.id } });
