@@ -60,7 +60,7 @@ function ExampleDetail() {
             Run a report like this on your own question
           </h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Free to start. 5 reports/month on Free, no credit card required.
+            Free to start. 5 reports/day on Free, no credit card required.
           </p>
           <Button asChild className="mt-4">
             <Link to="/signup">Start researching free <ArrowRight className="ml-2 h-4 w-4" /></Link>
