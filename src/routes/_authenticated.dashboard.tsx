@@ -13,11 +13,27 @@ import { Loader2, Search, Trash2, FileText, Sparkles, Zap, Layers, Telescope } f
 import { formatDistanceToNow } from "date-fns";
 
 type Depth = "quick" | "standard" | "deep";
+type Length = "brief" | "short" | "medium" | "long";
+type Level = "school" | "undergrad" | "postgrad" | "phd";
 
 const DEPTH_OPTIONS: Array<{ value: Depth; label: string; desc: string; icon: typeof Zap }> = [
   { value: "quick", label: "Quick", desc: "~30s · 3 queries · ~12 sources", icon: Zap },
   { value: "standard", label: "Standard", desc: "~2 min · 5+3 queries · ~22 sources", icon: Layers },
   { value: "deep", label: "Deep", desc: "~4 min · 7+8 queries · ~35 sources · Pro", icon: Telescope },
+];
+
+const LENGTH_OPTIONS: Array<{ value: Length; label: string; desc: string }> = [
+  { value: "brief", label: "Brief", desc: "< 250 words" },
+  { value: "short", label: "Short", desc: "250 – 750 words" },
+  { value: "medium", label: "Medium", desc: "750 – 1000 words" },
+  { value: "long", label: "Long", desc: "1000+ words" },
+];
+
+const LEVEL_OPTIONS: Array<{ value: Level; label: string; desc: string }> = [
+  { value: "school", label: "School", desc: "Plain English, no jargon" },
+  { value: "undergrad", label: "Undergrad", desc: "Clear academic prose" },
+  { value: "postgrad", label: "Postgrad", desc: "Domain-literate, analytical" },
+  { value: "phd", label: "PhD / Expert", desc: "Rigorous, technical" },
 ];
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
