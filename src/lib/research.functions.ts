@@ -236,23 +236,17 @@ export const startResearch = createServerFn({ method: "POST" })
       throw new Error("Deep research is available on the Pro plan. Upgrade to unlock.");
     }
 
-    // Free plan: daily quota. Paid plans: monthly quota.
-    const windowStart = new Date();
-    if (plan === "free") {
-      windowStart.setUTCHours(0, 0, 0, 0);
-    } else {
-      windowStart.setUTCDate(1);
-      windowStart.setUTCHours(0, 0, 0, 0);
-    }
+    const monthStart = new Date();
+    monthStart.setUTCDate(1);
+    monthStart.setUTCHours(0, 0, 0, 0);
     const { count } = await supabase
       .from("research_reports")
       .select("id", { count: "exact", head: true })
       .eq("user_id", userId)
-      .gte("created_at", windowStart.toISOString());
+      .gte("created_at", monthStart.toISOString());
 
     if ((count ?? 0) >= quota) {
-      const period = plan === "free" ? "Daily" : "Monthly";
-      throw new Error(`${period} quota of ${quota} reports reached on the ${plan} plan. Upgrade for more.`);
+      throw new Error(`Monthly quota of ${quota} reports reached on the ${plan} plan. Upgrade for more.`);
     }
 
     // Create pending report
