@@ -2,11 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-const PLAN_QUOTAS: Record<string, { limit: number; window: "day" | "month" }> = {
-  free: { limit: 5, window: "day" },
-  pro: { limit: 75, window: "day" },
-  enterprise: { limit: 10000, window: "month" },
-};
+const DEFAULT_QUOTA = { limit: 75, window: "day" as const };
 
 type Depth = "quick" | "standard" | "deep";
 type Length = "brief" | "short" | "medium" | "long";
@@ -263,18 +259,7 @@ export const startResearch = createServerFn({ method: "POST" })
     const lengthLabel = lengthCfg?.label ?? `~${cfg.targetWords} words`;
 
     // Quota check
-    const { data: sub } = await supabase
-      .from("subscriptions")
-      .select("plan, status")
-      .eq("user_id", userId)
-      .maybeSingle();
-    const plan = sub?.plan ?? "free";
-    const quotaCfg = PLAN_QUOTAS[plan] ?? PLAN_QUOTAS.free;
-
-    // Restrict deep mode to paid plans to keep free tier costs bounded.
-    if (data.depth === "deep" && plan === "free") {
-      throw new Error("Deep research is available on the Pro plan. Upgrade to unlock.");
-    }
+    const quotaCfg = DEFAULT_QUOTA;
 
     const windowStart = new Date();
     if (quotaCfg.window === "day") {
@@ -291,7 +276,7 @@ export const startResearch = createServerFn({ method: "POST" })
 
     if ((count ?? 0) >= quotaCfg.limit) {
       const period = quotaCfg.window === "day" ? "Daily" : "Monthly";
-      throw new Error(`${period} quota of ${quotaCfg.limit} reports reached on the ${plan} plan. Upgrade for more.`);
+      throw new Error(`${period} quota of ${quotaCfg.limit} reports reached.`);
     }
 
     // Create pending report

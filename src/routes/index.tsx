@@ -347,58 +347,6 @@ function LandingPage() {
           </div>
         </section>
 
-        {/* Pricing teaser */}
-        <section className="border-b border-border bg-muted/20">
-          <div className="mx-auto max-w-6xl px-4 py-20">
-            <div className="text-center">
-              <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-                Start free. Scale when the research scales.
-              </h2>
-              <p className="mt-3 text-muted-foreground">
-                Usage-based pricing built for individual operators and growing teams.
-              </p>
-            </div>
-            <div className="mt-12 grid gap-6 lg:grid-cols-3">
-              {[
-                {
-                  name: "Free",
-                  price: "$0",
-                  body: "5 reports/day, cited reports, Markdown & PDF exports, private workspace.",
-                },
-                {
-                  name: "Pro",
-                  price: "$29",
-                  body: "100 reports/month, faster generation, deep research mode, full report history.",
-                  featured: true,
-                },
-                {
-                  name: "Team",
-                  price: "Custom",
-                  body: "Shared workspace, admin controls, private team reports, priority support.",
-                },
-              ].map((p) => (
-                <div
-                  key={p.name}
-                  className={`rounded-xl border bg-card p-6 ${
-                    p.featured ? "border-primary shadow-lg ring-1 ring-primary" : "border-border"
-                  }`}
-                >
-                  <div className="flex items-baseline justify-between">
-                    <h3 className="text-lg font-semibold text-card-foreground">{p.name}</h3>
-                    <span className="text-2xl font-bold text-foreground">{p.price}</span>
-                  </div>
-                  <p className="mt-3 text-sm text-muted-foreground">{p.body}</p>
-                </div>
-              ))}
-            </div>
-            <div className="mt-8 text-center">
-              <Button asChild variant="outline">
-                <Link to="/pricing">See full pricing</Link>
-              </Button>
-            </div>
-          </div>
-        </section>
-
         {/* Built for the next generation */}
         <section className="border-b border-border">
           <div className="mx-auto max-w-4xl px-4 py-20 text-center">
@@ -444,7 +392,6 @@ function LandingPage() {
           <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
             <Link to="/examples" className="hover:text-foreground">Examples</Link>
             <Link to="/how-it-works" className="hover:text-foreground">How it works</Link>
-            <Link to="/pricing" className="hover:text-foreground">Pricing</Link>
             <Link to="/security" className="hover:text-foreground">Security</Link>
           </div>
           <div className="mt-4 text-center text-sm text-muted-foreground">

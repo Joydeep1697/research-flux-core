@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/settings")({
@@ -29,19 +28,6 @@ function SettingsPage() {
         .from("profiles")
         .select("display_name, avatar_url")
         .eq("user_id", user!.id)
-        .maybeSingle();
-      if (error) throw new Error(error.message);
-      return data;
-    },
-    enabled: !!user,
-  });
-
-  const { data: subscription } = useQuery({
-    queryKey: ["subscription", user?.id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("subscriptions")
-        .select("plan, status, current_period_end")
         .maybeSingle();
       if (error) throw new Error(error.message);
       return data;
@@ -134,20 +120,6 @@ function SettingsPage() {
             {saving ? "Saving…" : "Save profile"}
           </Button>
         </form>
-      </section>
-
-      <section className="mt-6 rounded-xl border border-border bg-card p-6">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h2 className="font-semibold text-card-foreground">Subscription</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Current plan: <Badge variant="secondary" className="ml-1 capitalize">{subscription?.plan ?? "free"}</Badge>
-            </p>
-          </div>
-          <Button variant="outline" asChild>
-            <a href="/pricing">Manage plan</a>
-          </Button>
-        </div>
       </section>
     </main>
   );
