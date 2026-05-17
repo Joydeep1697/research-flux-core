@@ -74,26 +74,7 @@ function DashboardPage() {
     },
   });
 
-  const { data: subscription } = useQuery({
-    queryKey: ["subscription", user?.id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("subscriptions")
-        .select("plan, status")
-        .maybeSingle();
-      if (error) throw new Error(error.message);
-      return data;
-    },
-    enabled: !!user,
-  });
-
-  const plan = subscription?.plan ?? "free";
-  const quotaCfg =
-    plan === "enterprise"
-      ? { limit: 10000, window: "month" as const }
-      : plan === "pro"
-        ? { limit: 75, window: "day" as const }
-        : { limit: 5, window: "day" as const };
+  const quotaCfg = { limit: 75, window: "day" as const };
 
   const { data: periodCount = 0 } = useQuery({
     queryKey: ["reports-period", user?.id, quotaCfg.window],
@@ -168,7 +149,6 @@ function DashboardPage() {
           <p className="mt-1 text-sm text-muted-foreground">Ask a question. Get a cited report.</p>
         </div>
         <div className="flex flex-col items-end gap-2">
-          <Badge variant="secondary" className="capitalize">{plan} plan</Badge>
           <div className="w-48">
             <div className="flex items-center justify-between text-[11px] text-muted-foreground">
               <span>{periodLabel}</span>
@@ -201,7 +181,7 @@ function DashboardPage() {
           {DEPTH_OPTIONS.map((opt) => {
             const Icon = opt.icon;
             const selected = depth === opt.value;
-            const locked = opt.value === "deep" && plan === "free";
+            const locked = false;
             return (
               <button
                 key={opt.value}

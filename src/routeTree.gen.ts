@@ -13,7 +13,6 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SecurityRouteImport } from './routes/security'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
-import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
@@ -25,7 +24,6 @@ import { Route as ExamplesSlugRouteImport } from './routes/examples.$slug'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated.settings'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated.admin'
-import { Route as ApiPublicBillingWebhookRouteImport } from './routes/api/public/billing-webhook'
 import { Route as AuthenticatedResearchIdRouteImport } from './routes/_authenticated.research.$id'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -46,11 +44,6 @@ const SecurityRoute = SecurityRouteImport.update({
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PricingRoute = PricingRouteImport.update({
-  id: '/pricing',
-  path: '/pricing',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -107,11 +100,6 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const ApiPublicBillingWebhookRoute = ApiPublicBillingWebhookRouteImport.update({
-  id: '/api/public/billing-webhook',
-  path: '/api/public/billing-webhook',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AuthenticatedResearchIdRoute = AuthenticatedResearchIdRouteImport.update({
   id: '/research/$id',
   path: '/research/$id',
@@ -124,7 +112,6 @@ export interface FileRoutesByFullPath {
   '/forgot-password': typeof ForgotPasswordRoute
   '/how-it-works': typeof HowItWorksRoute
   '/login': typeof LoginRoute
-  '/pricing': typeof PricingRoute
   '/reset-password': typeof ResetPasswordRoute
   '/security': typeof SecurityRoute
   '/signup': typeof SignupRoute
@@ -135,7 +122,6 @@ export interface FileRoutesByFullPath {
   '/examples/$slug': typeof ExamplesSlugRoute
   '/r/$slug': typeof RSlugRoute
   '/research/$id': typeof AuthenticatedResearchIdRoute
-  '/api/public/billing-webhook': typeof ApiPublicBillingWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -143,7 +129,6 @@ export interface FileRoutesByTo {
   '/forgot-password': typeof ForgotPasswordRoute
   '/how-it-works': typeof HowItWorksRoute
   '/login': typeof LoginRoute
-  '/pricing': typeof PricingRoute
   '/reset-password': typeof ResetPasswordRoute
   '/security': typeof SecurityRoute
   '/signup': typeof SignupRoute
@@ -154,7 +139,6 @@ export interface FileRoutesByTo {
   '/examples/$slug': typeof ExamplesSlugRoute
   '/r/$slug': typeof RSlugRoute
   '/research/$id': typeof AuthenticatedResearchIdRoute
-  '/api/public/billing-webhook': typeof ApiPublicBillingWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -164,7 +148,6 @@ export interface FileRoutesById {
   '/forgot-password': typeof ForgotPasswordRoute
   '/how-it-works': typeof HowItWorksRoute
   '/login': typeof LoginRoute
-  '/pricing': typeof PricingRoute
   '/reset-password': typeof ResetPasswordRoute
   '/security': typeof SecurityRoute
   '/signup': typeof SignupRoute
@@ -175,7 +158,6 @@ export interface FileRoutesById {
   '/examples/$slug': typeof ExamplesSlugRoute
   '/r/$slug': typeof RSlugRoute
   '/_authenticated/research/$id': typeof AuthenticatedResearchIdRoute
-  '/api/public/billing-webhook': typeof ApiPublicBillingWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -185,7 +167,6 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/how-it-works'
     | '/login'
-    | '/pricing'
     | '/reset-password'
     | '/security'
     | '/signup'
@@ -196,7 +177,6 @@ export interface FileRouteTypes {
     | '/examples/$slug'
     | '/r/$slug'
     | '/research/$id'
-    | '/api/public/billing-webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -204,7 +184,6 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/how-it-works'
     | '/login'
-    | '/pricing'
     | '/reset-password'
     | '/security'
     | '/signup'
@@ -215,7 +194,6 @@ export interface FileRouteTypes {
     | '/examples/$slug'
     | '/r/$slug'
     | '/research/$id'
-    | '/api/public/billing-webhook'
   id:
     | '__root__'
     | '/'
@@ -224,7 +202,6 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/how-it-works'
     | '/login'
-    | '/pricing'
     | '/reset-password'
     | '/security'
     | '/signup'
@@ -235,7 +212,6 @@ export interface FileRouteTypes {
     | '/examples/$slug'
     | '/r/$slug'
     | '/_authenticated/research/$id'
-    | '/api/public/billing-webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -245,13 +221,11 @@ export interface RootRouteChildren {
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   HowItWorksRoute: typeof HowItWorksRoute
   LoginRoute: typeof LoginRoute
-  PricingRoute: typeof PricingRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SecurityRoute: typeof SecurityRoute
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   RSlugRoute: typeof RSlugRoute
-  ApiPublicBillingWebhookRoute: typeof ApiPublicBillingWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -282,13 +256,6 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/pricing': {
-      id: '/pricing'
-      path: '/pricing'
-      fullPath: '/pricing'
-      preLoaderRoute: typeof PricingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -368,13 +335,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/api/public/billing-webhook': {
-      id: '/api/public/billing-webhook'
-      path: '/api/public/billing-webhook'
-      fullPath: '/api/public/billing-webhook'
-      preLoaderRoute: typeof ApiPublicBillingWebhookRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/_authenticated/research/$id': {
       id: '/_authenticated/research/$id'
       path: '/research/$id'
@@ -422,14 +382,22 @@ const rootRouteChildren: RootRouteChildren = {
   ForgotPasswordRoute: ForgotPasswordRoute,
   HowItWorksRoute: HowItWorksRoute,
   LoginRoute: LoginRoute,
-  PricingRoute: PricingRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SecurityRoute: SecurityRoute,
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   RSlugRoute: RSlugRoute,
-  ApiPublicBillingWebhookRoute: ApiPublicBillingWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

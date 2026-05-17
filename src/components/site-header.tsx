@@ -13,9 +13,11 @@ export function SiteHeader() {
   const { data: isAdmin } = useQuery({
     queryKey: ["is-admin", user?.id],
     queryFn: async () => {
+      if (!user) return false;
       const { data } = await supabase
         .from("user_roles")
         .select("role")
+        .eq("user_id", user.id)
         .eq("role", "admin")
         .maybeSingle();
       return !!data;
@@ -36,9 +38,6 @@ export function SiteHeader() {
           </Link>
           <Link to="/how-it-works" className="hidden px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground md:inline">
             How it works
-          </Link>
-          <Link to="/pricing" className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground">
-            Pricing
           </Link>
           {user ? (
             <>
