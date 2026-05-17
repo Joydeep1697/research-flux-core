@@ -153,8 +153,8 @@ function DashboardPage() {
           <Badge variant="secondary" className="capitalize">{plan} plan</Badge>
           <div className="w-48">
             <div className="flex items-center justify-between text-[11px] text-muted-foreground">
-              <span>This month</span>
-              <span>{monthlyCount} / {quota === 10000 ? "∞" : quota}</span>
+              <span>{periodLabel}</span>
+              <span>{periodCount} / {quotaCfg.limit === 10000 ? "∞" : quotaCfg.limit}</span>
             </div>
             <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-muted">
               <div
