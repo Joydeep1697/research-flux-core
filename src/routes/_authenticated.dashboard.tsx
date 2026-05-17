@@ -56,16 +56,21 @@ function DashboardPage() {
     },
   });
 
-  const { data: monthlyCount = 0 } = useQuery({
-    queryKey: ["reports-month", user?.id],
+  const { data: usageCount = 0 } = useQuery({
+    queryKey: ["reports-usage", user?.id, subscriptionPlanKey()],
     queryFn: async () => {
-      const monthStart = new Date();
-      monthStart.setUTCDate(1);
-      monthStart.setUTCHours(0, 0, 0, 0);
+      const plan = currentPlan();
+      const windowStart = new Date();
+      if (plan === "free") {
+        windowStart.setUTCHours(0, 0, 0, 0);
+      } else {
+        windowStart.setUTCDate(1);
+        windowStart.setUTCHours(0, 0, 0, 0);
+      }
       const { count, error } = await supabase
         .from("research_reports")
         .select("id", { count: "exact", head: true })
-        .gte("created_at", monthStart.toISOString());
+        .gte("created_at", windowStart.toISOString());
       if (error) throw new Error(error.message);
       return count ?? 0;
     },
