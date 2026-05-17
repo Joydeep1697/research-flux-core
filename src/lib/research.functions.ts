@@ -229,24 +229,29 @@ export const startResearch = createServerFn({ method: "POST" })
       .eq("user_id", userId)
       .maybeSingle();
     const plan = sub?.plan ?? "free";
-    const quota = PLAN_QUOTAS[plan] ?? 5;
+    const quotaCfg = PLAN_QUOTAS[plan] ?? PLAN_QUOTAS.free;
 
     // Restrict deep mode to paid plans to keep free tier costs bounded.
     if (data.depth === "deep" && plan === "free") {
       throw new Error("Deep research is available on the Pro plan. Upgrade to unlock.");
     }
 
-    const monthStart = new Date();
-    monthStart.setUTCDate(1);
-    monthStart.setUTCHours(0, 0, 0, 0);
+    const windowStart = new Date();
+    if (quotaCfg.window === "day") {
+      windowStart.setUTCHours(0, 0, 0, 0);
+    } else {
+      windowStart.setUTCDate(1);
+      windowStart.setUTCHours(0, 0, 0, 0);
+    }
     const { count } = await supabase
       .from("research_reports")
       .select("id", { count: "exact", head: true })
       .eq("user_id", userId)
-      .gte("created_at", monthStart.toISOString());
+      .gte("created_at", windowStart.toISOString());
 
-    if ((count ?? 0) >= quota) {
-      throw new Error(`Monthly quota of ${quota} reports reached on the ${plan} plan. Upgrade for more.`);
+    if ((count ?? 0) >= quotaCfg.limit) {
+      const period = quotaCfg.window === "day" ? "Daily" : "Monthly";
+      throw new Error(`${period} quota of ${quotaCfg.limit} reports reached on the ${plan} plan. Upgrade for more.`);
     }
 
     // Create pending report
