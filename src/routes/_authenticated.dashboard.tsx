@@ -56,22 +56,6 @@ function DashboardPage() {
     },
   });
 
-  const { data: monthlyCount = 0 } = useQuery({
-    queryKey: ["reports-month", user?.id],
-    queryFn: async () => {
-      const monthStart = new Date();
-      monthStart.setUTCDate(1);
-      monthStart.setUTCHours(0, 0, 0, 0);
-      const { count, error } = await supabase
-        .from("research_reports")
-        .select("id", { count: "exact", head: true })
-        .gte("created_at", monthStart.toISOString());
-      if (error) throw new Error(error.message);
-      return count ?? 0;
-    },
-    enabled: !!user,
-  });
-
   const { data: subscription } = useQuery({
     queryKey: ["subscription", user?.id],
     queryFn: async () => {
@@ -81,6 +65,28 @@ function DashboardPage() {
         .maybeSingle();
       if (error) throw new Error(error.message);
       return data;
+    },
+    enabled: !!user,
+  });
+
+  const plan = subscription?.plan ?? "free";
+
+  const { data: usageCount = 0 } = useQuery({
+    queryKey: ["reports-usage", user?.id, plan],
+    queryFn: async () => {
+      const windowStart = new Date();
+      if (plan === "free") {
+        windowStart.setUTCHours(0, 0, 0, 0);
+      } else {
+        windowStart.setUTCDate(1);
+        windowStart.setUTCHours(0, 0, 0, 0);
+      }
+      const { count, error } = await supabase
+        .from("research_reports")
+        .select("id", { count: "exact", head: true })
+        .gte("created_at", windowStart.toISOString());
+      if (error) throw new Error(error.message);
+      return count ?? 0;
     },
     enabled: !!user,
   });
@@ -115,9 +121,9 @@ function DashboardPage() {
     }
   };
 
-  const plan = subscription?.plan ?? "free";
   const quota = plan === "enterprise" ? 10000 : plan === "pro" ? 100 : 5;
-  const usagePct = Math.min(100, Math.round((monthlyCount / quota) * 100));
+  const usagePct = Math.min(100, Math.round((usageCount / quota) * 100));
+  const periodLabel = plan === "free" ? "Today" : "This month";
 
   const filteredReports = reports.filter((r) => {
     if (statusFilter === "completed" && r.status !== "completed") return false;
@@ -142,8 +148,8 @@ function DashboardPage() {
           <Badge variant="secondary" className="capitalize">{plan} plan</Badge>
           <div className="w-48">
             <div className="flex items-center justify-between text-[11px] text-muted-foreground">
-              <span>This month</span>
-              <span>{monthlyCount} / {quota === 10000 ? "∞" : quota}</span>
+              <span>{periodLabel}</span>
+              <span>{usageCount} / {quota === 10000 ? "∞" : quota}</span>
             </div>
             <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-muted">
               <div
