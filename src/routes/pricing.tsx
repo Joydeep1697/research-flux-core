@@ -19,7 +19,7 @@ const plans = [
     price: "$0",
     cadence: "forever",
     description: "Try the platform with real research.",
-    features: ["5 research reports / month", "Markdown & PDF export", "Full source citations", "Private workspace"],
+    features: ["5 research reports / day", "Markdown & PDF export", "Full source citations", "Private workspace"],
     cta: "Get started",
     href: "/signup",
   },
