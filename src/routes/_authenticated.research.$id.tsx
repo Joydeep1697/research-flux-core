@@ -185,7 +185,7 @@ function ReportPage() {
 
       {report.status === "completed" && report.content && (
         <>
-          <article className="prose prose-neutral dark:prose-invert mt-8 max-w-none rounded-xl border border-border bg-card p-8 [&_a]:text-primary [&_h1]:mt-0 [&_h1]:text-3xl [&_h1]:font-bold [&_h2]:mt-8 [&_h2]:text-xl [&_h2]:font-semibold [&_h3]:mt-6 [&_h3]:text-lg [&_h3]:font-semibold [&_li]:my-1 [&_li]:text-foreground [&_p]:my-3 [&_p]:leading-7 [&_p]:text-foreground [&_strong]:text-foreground [&_ul]:my-3 [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:my-3 [&_ol]:list-decimal [&_ol]:pl-6">
+          <article className="prose prose-neutral dark:prose-invert mt-8 max-w-none rounded-xl border border-border bg-card p-8 text-foreground [&_a]:text-primary [&_h1]:mt-0 [&_h1]:text-3xl [&_h1]:font-bold [&_h1]:text-foreground [&_h2]:mt-8 [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:text-foreground [&_h3]:mt-6 [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:text-foreground [&_li]:my-1 [&_li]:text-foreground [&_p]:my-3 [&_p]:leading-7 [&_p]:text-foreground [&_strong]:text-foreground [&_ul]:my-3 [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:my-3 [&_ol]:list-decimal [&_ol]:pl-6">
             <ReactMarkdown remarkPlugins={[remarkGfm]}>{displayContent}</ReactMarkdown>
           </article>
 
