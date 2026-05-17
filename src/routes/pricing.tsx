@@ -123,8 +123,3 @@ function PricingPage() {
     </div>
   );
 }
-        </div>
-      </main>
-    </div>
-  );
-}
