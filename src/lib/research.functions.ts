@@ -276,7 +276,7 @@ export const startResearch = createServerFn({ method: "POST" })
 
     if ((count ?? 0) >= quotaCfg.limit) {
       const period = quotaCfg.window === "day" ? "Daily" : "Monthly";
-      throw new Error(`${period} quota of ${quotaCfg.limit} reports reached on the ${plan} plan. Upgrade for more.`);
+      throw new Error(`${period} quota of ${quotaCfg.limit} reports reached.`);
     }
 
     // Create pending report
