@@ -16,9 +16,9 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
-import { Route as ExamplesRouteImport } from './routes/examples'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ExamplesIndexRouteImport } from './routes/examples.index'
 import { Route as RSlugRouteImport } from './routes/r.$slug'
 import { Route as ExamplesSlugRouteImport } from './routes/examples.$slug'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated.settings'
@@ -61,11 +61,6 @@ const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ExamplesRoute = ExamplesRouteImport.update({
-  id: '/examples',
-  path: '/examples',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
@@ -73,6 +68,11 @@ const AuthenticatedRoute = AuthenticatedRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExamplesIndexRoute = ExamplesIndexRouteImport.update({
+  id: '/examples/',
+  path: '/examples/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RSlugRoute = RSlugRouteImport.update({
@@ -108,7 +108,6 @@ const AuthenticatedResearchIdRoute = AuthenticatedResearchIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/examples': typeof ExamplesRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/how-it-works': typeof HowItWorksRoute
   '/login': typeof LoginRoute
@@ -121,11 +120,11 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AuthenticatedSettingsRoute
   '/examples/$slug': typeof ExamplesSlugRoute
   '/r/$slug': typeof RSlugRoute
+  '/examples/': typeof ExamplesIndexRoute
   '/research/$id': typeof AuthenticatedResearchIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/examples': typeof ExamplesRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/how-it-works': typeof HowItWorksRoute
   '/login': typeof LoginRoute
@@ -138,13 +137,13 @@ export interface FileRoutesByTo {
   '/settings': typeof AuthenticatedSettingsRoute
   '/examples/$slug': typeof ExamplesSlugRoute
   '/r/$slug': typeof RSlugRoute
+  '/examples': typeof ExamplesIndexRoute
   '/research/$id': typeof AuthenticatedResearchIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
-  '/examples': typeof ExamplesRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/how-it-works': typeof HowItWorksRoute
   '/login': typeof LoginRoute
@@ -157,13 +156,13 @@ export interface FileRoutesById {
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/examples/$slug': typeof ExamplesSlugRoute
   '/r/$slug': typeof RSlugRoute
+  '/examples/': typeof ExamplesIndexRoute
   '/_authenticated/research/$id': typeof AuthenticatedResearchIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/examples'
     | '/forgot-password'
     | '/how-it-works'
     | '/login'
@@ -176,11 +175,11 @@ export interface FileRouteTypes {
     | '/settings'
     | '/examples/$slug'
     | '/r/$slug'
+    | '/examples/'
     | '/research/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/examples'
     | '/forgot-password'
     | '/how-it-works'
     | '/login'
@@ -193,12 +192,12 @@ export interface FileRouteTypes {
     | '/settings'
     | '/examples/$slug'
     | '/r/$slug'
+    | '/examples'
     | '/research/$id'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
-    | '/examples'
     | '/forgot-password'
     | '/how-it-works'
     | '/login'
@@ -211,13 +210,13 @@ export interface FileRouteTypes {
     | '/_authenticated/settings'
     | '/examples/$slug'
     | '/r/$slug'
+    | '/examples/'
     | '/_authenticated/research/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
-  ExamplesRoute: typeof ExamplesRouteWithChildren
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   HowItWorksRoute: typeof HowItWorksRoute
   LoginRoute: typeof LoginRoute
@@ -226,6 +225,7 @@ export interface RootRouteChildren {
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   RSlugRoute: typeof RSlugRoute
+  ExamplesIndexRoute: typeof ExamplesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -279,13 +279,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/examples': {
-      id: '/examples'
-      path: '/examples'
-      fullPath: '/examples'
-      preLoaderRoute: typeof ExamplesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/_authenticated': {
       id: '/_authenticated'
       path: ''
@@ -298,6 +291,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/examples/': {
+      id: '/examples/'
+      path: '/examples'
+      fullPath: '/examples/'
+      preLoaderRoute: typeof ExamplesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/r/$slug': {
@@ -363,22 +363,9 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
-interface ExamplesRouteChildren {
-  ExamplesSlugRoute: typeof ExamplesSlugRoute
-}
-
-const ExamplesRouteChildren: ExamplesRouteChildren = {
-  ExamplesSlugRoute: ExamplesSlugRoute,
-}
-
-const ExamplesRouteWithChildren = ExamplesRoute._addFileChildren(
-  ExamplesRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
-  ExamplesRoute: ExamplesRouteWithChildren,
   ForgotPasswordRoute: ForgotPasswordRoute,
   HowItWorksRoute: HowItWorksRoute,
   LoginRoute: LoginRoute,
@@ -387,7 +374,18 @@ const rootRouteChildren: RootRouteChildren = {
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   RSlugRoute: RSlugRoute,
+  ExamplesIndexRoute: ExamplesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
