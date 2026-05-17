@@ -225,6 +225,58 @@ function DashboardPage() {
             );
           })}
         </div>
+
+        <div className="mt-4">
+          <p className="mb-2 text-xs font-medium text-muted-foreground">Report length</p>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            {LENGTH_OPTIONS.map((opt) => {
+              const selected = length === opt.value;
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setLength(opt.value)}
+                  disabled={submitting}
+                  className={`flex flex-col items-start gap-0.5 rounded-lg border p-2.5 text-left transition-colors ${
+                    selected
+                      ? "border-primary bg-primary/5"
+                      : "border-border bg-background hover:border-primary/40"
+                  }`}
+                  aria-pressed={selected}
+                >
+                  <span className="text-sm font-medium text-foreground">{opt.label}</span>
+                  <span className="text-[11px] text-muted-foreground">{opt.desc}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="mt-4">
+          <p className="mb-2 text-xs font-medium text-muted-foreground">Reading level</p>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            {LEVEL_OPTIONS.map((opt) => {
+              const selected = level === opt.value;
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setLevel(opt.value)}
+                  disabled={submitting}
+                  className={`flex flex-col items-start gap-0.5 rounded-lg border p-2.5 text-left transition-colors ${
+                    selected
+                      ? "border-primary bg-primary/5"
+                      : "border-border bg-background hover:border-primary/40"
+                  }`}
+                  aria-pressed={selected}
+                >
+                  <span className="text-sm font-medium text-foreground">{opt.label}</span>
+                  <span className="text-[11px] text-muted-foreground">{opt.desc}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
         <div className="mt-4 flex items-center justify-between gap-3">
           <p className="text-xs text-muted-foreground">
             Lumen plans queries, fans out web searches, audits gaps, and writes a cited Markdown report.
