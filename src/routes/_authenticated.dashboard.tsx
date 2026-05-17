@@ -92,7 +92,7 @@ function DashboardPage() {
     plan === "enterprise"
       ? { limit: 10000, window: "month" as const }
       : plan === "pro"
-        ? { limit: 100, window: "month" as const }
+        ? { limit: 75, window: "day" as const }
         : { limit: 5, window: "day" as const };
 
   const { data: periodCount = 0 } = useQuery({
