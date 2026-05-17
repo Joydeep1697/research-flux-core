@@ -81,9 +81,9 @@ const RSlugRoute = RSlugRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExamplesSlugRoute = ExamplesSlugRouteImport.update({
-  id: '/$slug',
-  path: '/$slug',
-  getParentRoute: () => ExamplesRoute,
+  id: '/examples/$slug',
+  path: '/examples/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   id: '/settings',
@@ -224,6 +224,7 @@ export interface RootRouteChildren {
   SecurityRoute: typeof SecurityRoute
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  ExamplesSlugRoute: typeof ExamplesSlugRoute
   RSlugRoute: typeof RSlugRoute
   ExamplesIndexRoute: typeof ExamplesIndexRoute
 }
@@ -309,10 +310,10 @@ declare module '@tanstack/react-router' {
     }
     '/examples/$slug': {
       id: '/examples/$slug'
-      path: '/$slug'
+      path: '/examples/$slug'
       fullPath: '/examples/$slug'
       preLoaderRoute: typeof ExamplesSlugRouteImport
-      parentRoute: typeof ExamplesRoute
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/settings': {
       id: '/_authenticated/settings'
@@ -373,6 +374,7 @@ const rootRouteChildren: RootRouteChildren = {
   SecurityRoute: SecurityRoute,
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  ExamplesSlugRoute: ExamplesSlugRoute,
   RSlugRoute: RSlugRoute,
   ExamplesIndexRoute: ExamplesIndexRoute,
 }
