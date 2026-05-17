@@ -73,7 +73,7 @@ function SignupPage() {
         </Link>
         <div className="rounded-xl border border-border bg-card p-8 shadow-sm">
           <h1 className="text-2xl font-semibold text-card-foreground">Create your account</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Free forever. 5 reports per month.</p>
+          <p className="mt-1 text-sm text-muted-foreground">Free forever. 5 reports per day. No credit card.</p>
 
           <Button type="button" variant="outline" className="mt-6 w-full" onClick={handleGoogle} disabled={loading}>
             Continue with Google
