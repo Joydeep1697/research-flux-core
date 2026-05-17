@@ -506,7 +506,12 @@ const WHY_NOW = [
   },
 ] as const;
 
-const PRICING = [
+const PRICING: ReadonlyArray<{
+  name: string;
+  price: string;
+  featured?: boolean;
+  features: readonly string[];
+}> = [
   {
     name: "Free",
     price: "$0",
@@ -523,7 +528,7 @@ const PRICING = [
     price: "Custom",
     features: ["Shared workspace", "Admin controls", "Private team reports", "Priority support"],
   },
-] as const;
+];
 
 const PRIVACY = [
   {
