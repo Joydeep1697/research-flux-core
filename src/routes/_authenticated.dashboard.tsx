@@ -56,10 +56,24 @@ function DashboardPage() {
     },
   });
 
-  const { data: usageCount = 0 } = useQuery({
-    queryKey: ["reports-usage", user?.id, subscriptionPlanKey()],
+  const { data: subscription } = useQuery({
+    queryKey: ["subscription", user?.id],
     queryFn: async () => {
-      const plan = currentPlan();
+      const { data, error } = await supabase
+        .from("subscriptions")
+        .select("plan, status")
+        .maybeSingle();
+      if (error) throw new Error(error.message);
+      return data;
+    },
+    enabled: !!user,
+  });
+
+  const plan = subscription?.plan ?? "free";
+
+  const { data: usageCount = 0 } = useQuery({
+    queryKey: ["reports-usage", user?.id, plan],
+    queryFn: async () => {
       const windowStart = new Date();
       if (plan === "free") {
         windowStart.setUTCHours(0, 0, 0, 0);
@@ -73,19 +87,6 @@ function DashboardPage() {
         .gte("created_at", windowStart.toISOString());
       if (error) throw new Error(error.message);
       return count ?? 0;
-    },
-    enabled: !!user,
-  });
-
-  const { data: subscription } = useQuery({
-    queryKey: ["subscription", user?.id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("subscriptions")
-        .select("plan, status")
-        .maybeSingle();
-      if (error) throw new Error(error.message);
-      return data;
     },
     enabled: !!user,
   });
