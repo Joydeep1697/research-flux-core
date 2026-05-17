@@ -261,13 +261,6 @@ export const startResearch = createServerFn({ method: "POST" })
       : baseCfg;
     const levelCfg = LEVEL_CONFIG[data.level];
     const lengthLabel = lengthCfg?.label ?? `~${cfg.targetWords} words`;
-    const { supabase, userId } = context;
-    const tavilyKey = process.env.TAVILY_API_KEY;
-    const lovableKey = process.env.LOVABLE_API_KEY;
-    if (!tavilyKey) throw new Error("Search provider is not configured.");
-    if (!lovableKey) throw new Error("AI provider is not configured.");
-
-    const cfg = DEPTH_CONFIG[data.depth];
 
     // Quota check
     const { data: sub } = await supabase
