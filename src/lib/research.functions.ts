@@ -373,7 +373,8 @@ REQUIRED STRUCTURE:
 - Numbered list of every cited source with its URL.
 
 RULES:
-- TARGET LENGTH: ~${cfg.targetWords} words. MINIMUM: ${cfg.minWords} words. Be substantive — do not pad.
+- TARGET LENGTH: ${lengthLabel} (aim for ~${cfg.targetWords} words, minimum ${cfg.minWords}). Be substantive — do not pad. If the target is short, collapse or omit sections (keep at least Executive Summary, Key Findings, Sources) rather than padding.
+- READING LEVEL — ${levelCfg.label}: ${levelCfg.guidance}
 - Cite EVERY non-trivial claim inline with bracketed numbers like [3], [7] that map to the numbered source list.
 - Prefer specifics over generalities: numbers, names, dates, mechanisms.
 - Where sources conflict, surface the conflict rather than averaging it away.
@@ -382,7 +383,7 @@ RULES:
           },
           {
             role: "user",
-            content: `Research question: ${data.query}\n\nDepth mode: ${data.depth}\n\nSources (${sources.length} total):\n\n${contextText}\n\nWrite the full report now.`,
+            content: `Research question: ${data.query}\n\nDepth mode: ${data.depth}\nTarget length: ${lengthLabel}\nReading level: ${levelCfg.label}\n\nSources (${sources.length} total):\n\n${contextText}\n\nWrite the full report now.`,
           },
         ],
         lovableKey,
