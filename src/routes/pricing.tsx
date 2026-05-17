@@ -14,15 +14,30 @@ export const Route = createFileRoute("/pricing")({
   component: PricingPage,
 });
 
-const plans = [
+type Plan = {
+  name: string;
+  price: string;
+  cadence: string;
+  description: string;
+  features: string[];
+  ctaLoggedOut: string;
+  ctaLoggedIn: string;
+  hrefLoggedOut: string;
+  hrefLoggedIn: string;
+  featured?: boolean;
+};
+
+const plans: Plan[] = [
   {
     name: "Free",
     price: "$0",
     cadence: "forever",
     description: "Try the platform with real research.",
     features: ["5 research reports / day", "Markdown & PDF export", "Full source citations", "Private workspace"],
-    cta: "Get started",
-    href: "/signup",
+    ctaLoggedOut: "Get started",
+    ctaLoggedIn: "Go to dashboard",
+    hrefLoggedOut: "/signup",
+    hrefLoggedIn: "/dashboard",
   },
   {
     name: "Pro",
@@ -30,8 +45,10 @@ const plans = [
     cadence: "per month",
     description: "For analysts, consultants, and indie researchers.",
     features: ["75 research reports / day", "Priority research queue", "Markdown & PDF export", "Full report history", "Email support"],
-    cta: "Upgrade to Pro",
-    href: "/signup",
+    ctaLoggedOut: "Start free, then upgrade",
+    ctaLoggedIn: "Upgrade to Pro",
+    hrefLoggedOut: "/signup",
+    hrefLoggedIn: "/settings",
     featured: true,
   },
   {
@@ -40,8 +57,10 @@ const plans = [
     cadence: "",
     description: "For teams that run research at scale.",
     features: ["Unlimited reports", "Team workspaces (coming soon)", "API access (coming soon)", "SSO & priority support"],
-    cta: "Contact sales",
-    href: "mailto:sales@example.com",
+    ctaLoggedOut: "Contact sales",
+    ctaLoggedIn: "Contact sales",
+    hrefLoggedOut: "mailto:sales@example.com",
+    hrefLoggedIn: "mailto:sales@example.com",
   },
 ];
 
