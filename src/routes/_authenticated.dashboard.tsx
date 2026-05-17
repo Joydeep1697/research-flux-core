@@ -56,22 +56,6 @@ function DashboardPage() {
     },
   });
 
-  const { data: monthlyCount = 0 } = useQuery({
-    queryKey: ["reports-month", user?.id],
-    queryFn: async () => {
-      const monthStart = new Date();
-      monthStart.setUTCDate(1);
-      monthStart.setUTCHours(0, 0, 0, 0);
-      const { count, error } = await supabase
-        .from("research_reports")
-        .select("id", { count: "exact", head: true })
-        .gte("created_at", monthStart.toISOString());
-      if (error) throw new Error(error.message);
-      return count ?? 0;
-    },
-    enabled: !!user,
-  });
-
   const { data: subscription } = useQuery({
     queryKey: ["subscription", user?.id],
     queryFn: async () => {
@@ -81,6 +65,34 @@ function DashboardPage() {
         .maybeSingle();
       if (error) throw new Error(error.message);
       return data;
+    },
+    enabled: !!user,
+  });
+
+  const plan = subscription?.plan ?? "free";
+  const quotaCfg =
+    plan === "enterprise"
+      ? { limit: 10000, window: "month" as const }
+      : plan === "pro"
+        ? { limit: 100, window: "month" as const }
+        : { limit: 5, window: "day" as const };
+
+  const { data: periodCount = 0 } = useQuery({
+    queryKey: ["reports-period", user?.id, quotaCfg.window],
+    queryFn: async () => {
+      const start = new Date();
+      if (quotaCfg.window === "day") {
+        start.setUTCHours(0, 0, 0, 0);
+      } else {
+        start.setUTCDate(1);
+        start.setUTCHours(0, 0, 0, 0);
+      }
+      const { count, error } = await supabase
+        .from("research_reports")
+        .select("id", { count: "exact", head: true })
+        .gte("created_at", start.toISOString());
+      if (error) throw new Error(error.message);
+      return count ?? 0;
     },
     enabled: !!user,
   });
@@ -115,9 +127,8 @@ function DashboardPage() {
     }
   };
 
-  const plan = subscription?.plan ?? "free";
-  const quota = plan === "enterprise" ? 10000 : plan === "pro" ? 100 : 5;
-  const usagePct = Math.min(100, Math.round((monthlyCount / quota) * 100));
+  const usagePct = Math.min(100, Math.round((periodCount / quotaCfg.limit) * 100));
+  const periodLabel = quotaCfg.window === "day" ? "Today" : "This month";
 
   const filteredReports = reports.filter((r) => {
     if (statusFilter === "completed" && r.status !== "completed") return false;
