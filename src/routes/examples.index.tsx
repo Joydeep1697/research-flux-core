@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { SAMPLE_REPORTS } from "@/lib/sample-reports";
 import { ArrowRight, Clock, FileText } from "lucide-react";
 
-export const Route = createFileRoute("/examples")({
+export const Route = createFileRoute("/examples/")({
   head: () => ({
     meta: [
       { title: "Example Research Reports — Lumen Research" },
