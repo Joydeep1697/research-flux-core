@@ -242,10 +242,25 @@ export const startResearch = createServerFn({ method: "POST" })
       .object({
         query: z.string().min(8, "Question is too short").max(500, "Question is too long"),
         depth: z.enum(["quick", "standard", "deep"]).default("standard"),
+        length: z.enum(["brief", "short", "medium", "long"]).optional(),
+        level: z.enum(["school", "undergrad", "postgrad", "phd"]).default("undergrad"),
       })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const tavilyKey = process.env.TAVILY_API_KEY;
+    const lovableKey = process.env.LOVABLE_API_KEY;
+    if (!tavilyKey) throw new Error("Search provider is not configured.");
+    if (!lovableKey) throw new Error("AI provider is not configured.");
+
+    const baseCfg = DEPTH_CONFIG[data.depth];
+    const lengthCfg = data.length ? LENGTH_CONFIG[data.length] : null;
+    const cfg: DepthConfig = lengthCfg
+      ? { ...baseCfg, minWords: lengthCfg.minWords, targetWords: lengthCfg.targetWords }
+      : baseCfg;
+    const levelCfg = LEVEL_CONFIG[data.level];
+    const lengthLabel = lengthCfg?.label ?? `~${cfg.targetWords} words`;
     const { supabase, userId } = context;
     const tavilyKey = process.env.TAVILY_API_KEY;
     const lovableKey = process.env.LOVABLE_API_KEY;
