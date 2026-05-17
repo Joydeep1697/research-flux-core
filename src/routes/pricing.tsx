@@ -28,7 +28,7 @@ const plans = [
     price: "$29",
     cadence: "per month",
     description: "For analysts, consultants, and indie researchers.",
-    features: ["100 research reports / month", "Priority research queue", "Markdown & PDF export", "Full report history", "Email support"],
+    features: ["75 research reports / day", "Priority research queue", "Markdown & PDF export", "Full report history", "Email support"],
     cta: "Upgrade to Pro",
     href: "/signup",
     featured: true,

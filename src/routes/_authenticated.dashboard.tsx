@@ -13,11 +13,27 @@ import { Loader2, Search, Trash2, FileText, Sparkles, Zap, Layers, Telescope } f
 import { formatDistanceToNow } from "date-fns";
 
 type Depth = "quick" | "standard" | "deep";
+type Length = "brief" | "short" | "medium" | "long";
+type Level = "school" | "undergrad" | "postgrad" | "phd";
 
 const DEPTH_OPTIONS: Array<{ value: Depth; label: string; desc: string; icon: typeof Zap }> = [
   { value: "quick", label: "Quick", desc: "~30s · 3 queries · ~12 sources", icon: Zap },
   { value: "standard", label: "Standard", desc: "~2 min · 5+3 queries · ~22 sources", icon: Layers },
   { value: "deep", label: "Deep", desc: "~4 min · 7+8 queries · ~35 sources · Pro", icon: Telescope },
+];
+
+const LENGTH_OPTIONS: Array<{ value: Length; label: string; desc: string }> = [
+  { value: "brief", label: "Brief", desc: "< 250 words" },
+  { value: "short", label: "Short", desc: "250 – 750 words" },
+  { value: "medium", label: "Medium", desc: "750 – 1000 words" },
+  { value: "long", label: "Long", desc: "1000+ words" },
+];
+
+const LEVEL_OPTIONS: Array<{ value: Level; label: string; desc: string }> = [
+  { value: "school", label: "School", desc: "Plain English, no jargon" },
+  { value: "undergrad", label: "Undergrad", desc: "Clear academic prose" },
+  { value: "postgrad", label: "Postgrad", desc: "Domain-literate, analytical" },
+  { value: "phd", label: "PhD / Expert", desc: "Rigorous, technical" },
 ];
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
@@ -33,6 +49,8 @@ function DashboardPage() {
   const removeReport = useServerFn(deleteReport);
   const [query, setQuery] = useState("");
   const [depth, setDepth] = useState<Depth>("standard");
+  const [length, setLength] = useState<Length>("medium");
+  const [level, setLevel] = useState<Level>("undergrad");
   const [submitting, setSubmitting] = useState(false);
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -74,7 +92,7 @@ function DashboardPage() {
     plan === "enterprise"
       ? { limit: 10000, window: "month" as const }
       : plan === "pro"
-        ? { limit: 100, window: "month" as const }
+        ? { limit: 75, window: "day" as const }
         : { limit: 5, window: "day" as const };
 
   const { data: periodCount = 0 } = useQuery({
@@ -105,7 +123,7 @@ function DashboardPage() {
     }
     setSubmitting(true);
     try {
-      const result = await runResearch({ data: { query: query.trim(), depth } });
+      const result = await runResearch({ data: { query: query.trim(), depth, length, level } });
       setQuery("");
       queryClient.invalidateQueries({ queryKey: ["reports"] });
       navigate({ to: "/research/$id", params: { id: result.id } });
@@ -206,6 +224,58 @@ function DashboardPage() {
               </button>
             );
           })}
+        </div>
+
+        <div className="mt-4">
+          <p className="mb-2 text-xs font-medium text-muted-foreground">Report length</p>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            {LENGTH_OPTIONS.map((opt) => {
+              const selected = length === opt.value;
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setLength(opt.value)}
+                  disabled={submitting}
+                  className={`flex flex-col items-start gap-0.5 rounded-lg border p-2.5 text-left transition-colors ${
+                    selected
+                      ? "border-primary bg-primary/5"
+                      : "border-border bg-background hover:border-primary/40"
+                  }`}
+                  aria-pressed={selected}
+                >
+                  <span className="text-sm font-medium text-foreground">{opt.label}</span>
+                  <span className="text-[11px] text-muted-foreground">{opt.desc}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="mt-4">
+          <p className="mb-2 text-xs font-medium text-muted-foreground">Reading level</p>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            {LEVEL_OPTIONS.map((opt) => {
+              const selected = level === opt.value;
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setLevel(opt.value)}
+                  disabled={submitting}
+                  className={`flex flex-col items-start gap-0.5 rounded-lg border p-2.5 text-left transition-colors ${
+                    selected
+                      ? "border-primary bg-primary/5"
+                      : "border-border bg-background hover:border-primary/40"
+                  }`}
+                  aria-pressed={selected}
+                >
+                  <span className="text-sm font-medium text-foreground">{opt.label}</span>
+                  <span className="text-[11px] text-muted-foreground">{opt.desc}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
         <div className="mt-4 flex items-center justify-between gap-3">
           <p className="text-xs text-muted-foreground">

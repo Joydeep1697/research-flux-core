@@ -4,11 +4,43 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const PLAN_QUOTAS: Record<string, { limit: number; window: "day" | "month" }> = {
   free: { limit: 5, window: "day" },
-  pro: { limit: 100, window: "month" },
+  pro: { limit: 75, window: "day" },
   enterprise: { limit: 10000, window: "month" },
 };
 
 type Depth = "quick" | "standard" | "deep";
+type Length = "brief" | "short" | "medium" | "long";
+type Level = "school" | "undergrad" | "postgrad" | "phd";
+
+const LENGTH_CONFIG: Record<Length, { minWords: number; targetWords: number; label: string }> = {
+  brief: { minWords: 150, targetWords: 220, label: "under 250 words" },
+  short: { minWords: 250, targetWords: 500, label: "between 250 and 750 words" },
+  medium: { minWords: 750, targetWords: 900, label: "between 750 and 1000 words" },
+  long: { minWords: 1000, targetWords: 1600, label: "over 1000 words" },
+};
+
+const LEVEL_CONFIG: Record<Level, { label: string; guidance: string }> = {
+  school: {
+    label: "School",
+    guidance:
+      "Write for a high-school audience: short sentences, plain English, define any technical term in parentheses, avoid jargon, use concrete examples.",
+  },
+  undergrad: {
+    label: "Undergraduate",
+    guidance:
+      "Write at an undergraduate level: clear academic prose, introduce key concepts before using them, balanced explanation and analysis.",
+  },
+  postgrad: {
+    label: "Postgraduate",
+    guidance:
+      "Write at a graduate level: assume domain literacy, use precise terminology, engage critically with methods and trade-offs, compare frameworks.",
+  },
+  phd: {
+    label: "PhD / Expert",
+    guidance:
+      "Write at a doctoral / expert level: rigorous, technical, scrutinise methodology, surface epistemic uncertainty, situate findings in the broader literature, use field-specific terminology without dilution.",
+  },
+};
 
 type DepthConfig = {
   initialSubQueries: number;
@@ -210,6 +242,8 @@ export const startResearch = createServerFn({ method: "POST" })
       .object({
         query: z.string().min(8, "Question is too short").max(500, "Question is too long"),
         depth: z.enum(["quick", "standard", "deep"]).default("standard"),
+        length: z.enum(["brief", "short", "medium", "long"]).optional(),
+        level: z.enum(["school", "undergrad", "postgrad", "phd"]).default("undergrad"),
       })
       .parse(input),
   )
@@ -220,7 +254,13 @@ export const startResearch = createServerFn({ method: "POST" })
     if (!tavilyKey) throw new Error("Search provider is not configured.");
     if (!lovableKey) throw new Error("AI provider is not configured.");
 
-    const cfg = DEPTH_CONFIG[data.depth];
+    const baseCfg = DEPTH_CONFIG[data.depth];
+    const lengthCfg = data.length ? LENGTH_CONFIG[data.length] : null;
+    const cfg: DepthConfig = lengthCfg
+      ? { ...baseCfg, minWords: lengthCfg.minWords, targetWords: lengthCfg.targetWords }
+      : baseCfg;
+    const levelCfg = LEVEL_CONFIG[data.level];
+    const lengthLabel = lengthCfg?.label ?? `~${cfg.targetWords} words`;
 
     // Quota check
     const { data: sub } = await supabase
@@ -333,7 +373,8 @@ REQUIRED STRUCTURE:
 - Numbered list of every cited source with its URL.
 
 RULES:
-- TARGET LENGTH: ~${cfg.targetWords} words. MINIMUM: ${cfg.minWords} words. Be substantive — do not pad.
+- TARGET LENGTH: ${lengthLabel} (aim for ~${cfg.targetWords} words, minimum ${cfg.minWords}). Be substantive — do not pad. If the target is short, collapse or omit sections (keep at least Executive Summary, Key Findings, Sources) rather than padding.
+- READING LEVEL — ${levelCfg.label}: ${levelCfg.guidance}
 - Cite EVERY non-trivial claim inline with bracketed numbers like [3], [7] that map to the numbered source list.
 - Prefer specifics over generalities: numbers, names, dates, mechanisms.
 - Where sources conflict, surface the conflict rather than averaging it away.
@@ -342,7 +383,7 @@ RULES:
           },
           {
             role: "user",
-            content: `Research question: ${data.query}\n\nDepth mode: ${data.depth}\n\nSources (${sources.length} total):\n\n${contextText}\n\nWrite the full report now.`,
+            content: `Research question: ${data.query}\n\nDepth mode: ${data.depth}\nTarget length: ${lengthLabel}\nReading level: ${levelCfg.label}\n\nSources (${sources.length} total):\n\n${contextText}\n\nWrite the full report now.`,
           },
         ],
         lovableKey,
