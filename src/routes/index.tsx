@@ -63,7 +63,7 @@ function LandingPage() {
             <div>
               <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground">
                 <Sparkles className="h-3.5 w-3.5 text-primary" />
-                AI research analyst · live web · cited output
+                AI Research Analyst · Live Web · Cited Output
               </div>
               <h1 className="text-balance text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
                 Source-backed research reports in minutes, not hours.
