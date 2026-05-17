@@ -121,9 +121,9 @@ function DashboardPage() {
     }
   };
 
-  const plan = subscription?.plan ?? "free";
   const quota = plan === "enterprise" ? 10000 : plan === "pro" ? 100 : 5;
-  const usagePct = Math.min(100, Math.round((monthlyCount / quota) * 100));
+  const usagePct = Math.min(100, Math.round((usageCount / quota) * 100));
+  const periodLabel = plan === "free" ? "Today" : "This month";
 
   const filteredReports = reports.filter((r) => {
     if (statusFilter === "completed" && r.status !== "completed") return false;
@@ -148,8 +148,8 @@ function DashboardPage() {
           <Badge variant="secondary" className="capitalize">{plan} plan</Badge>
           <div className="w-48">
             <div className="flex items-center justify-between text-[11px] text-muted-foreground">
-              <span>This month</span>
-              <span>{monthlyCount} / {quota === 10000 ? "∞" : quota}</span>
+              <span>{periodLabel}</span>
+              <span>{usageCount} / {quota === 10000 ? "∞" : quota}</span>
             </div>
             <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-muted">
               <div
