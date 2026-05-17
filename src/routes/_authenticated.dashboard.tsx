@@ -49,6 +49,8 @@ function DashboardPage() {
   const removeReport = useServerFn(deleteReport);
   const [query, setQuery] = useState("");
   const [depth, setDepth] = useState<Depth>("standard");
+  const [length, setLength] = useState<Length>("medium");
+  const [level, setLevel] = useState<Level>("undergrad");
   const [submitting, setSubmitting] = useState(false);
 
   const [searchTerm, setSearchTerm] = useState("");
